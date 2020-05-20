@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:maney/pages/widget.dart';
+
 
 class Home extends StatefulWidget {
   @override
@@ -13,16 +15,17 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text('Accueil'),
         centerTitle: true,
-        backgroundColor: Colors.purpleAccent,
+        backgroundColor: Colors.deepPurpleAccent[400],
       ),
       body: Center(
         child: Text(
-          'Bienvenudos',
+          'La liste des clients en détail',
           style: TextStyle(
           fontSize: 30
           )
         ),
       ),
+      drawer: DrawerWidget()
     );
   }
 }

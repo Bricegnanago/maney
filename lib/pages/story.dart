@@ -3,24 +3,23 @@ import 'package:flutter/widgets.dart';
 import 'package:maney/pages/widget.dart';
 
 
-class Analytics extends StatefulWidget {
+class Story extends StatefulWidget {
   @override
-  _AnalyticsState createState() => _AnalyticsState();
+  _StoryState createState() => _StoryState();
 }
 
-class _AnalyticsState extends State<Analytics> {
+class _StoryState extends State<Story> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Analyse des données'),
+        title: Text("Historique d'activité"),
         centerTitle: true,
         backgroundColor: Colors.deepPurpleAccent[400],
       ),
       body: Center(
-        child: Text(      
-          'Analyse statistiques',          
-          textAlign: TextAlign.center,
+        child: Text(
+          "Activité hebdomadaire",
           style: TextStyle(
           fontSize: 30
           )
