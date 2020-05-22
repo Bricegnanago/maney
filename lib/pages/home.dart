@@ -11,6 +11,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    final Map data = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
         title: Text('Accueil'),
@@ -25,7 +26,7 @@ class _HomeState extends State<Home> {
           )
         ),
       ),
-      drawer: DrawerWidget()
+      drawer: DrawerWidget(userData: data["username"])
     );
   }
 }
