@@ -1,0 +1,1 @@
+insert into story VALUES(null, 1, 1, 3000.0, 1,strftime('%d-%m-%Y %H:%M:%S', datetime('now')) , null)

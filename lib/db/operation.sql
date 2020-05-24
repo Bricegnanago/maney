@@ -1,0 +1,1 @@
+#create TABLE operation(operation_id integer PRIMARY KEY AUTOINCREMENT not null, title text, description TEXT)
