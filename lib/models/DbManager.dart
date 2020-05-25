@@ -3,10 +3,6 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:maney/models/user.dart';
 
-main(List<String> args) {
-  print("Bonjour");
-}
-
 class DbUserManager {
   Database _database;
   DbUserManager();
@@ -33,26 +29,31 @@ class DbUserManager {
             Creation de la table uitilisateur
           */
         final String reqUser = 'CREATE TABLE user('
-            'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+            'user_id INTEGER PRIMARY KEY AUTOINCREMENT,'
             'username TEXT NOT NULL,'
             'password TEXT NOT NULL,'
             'status INTEGER DEFAULT 1,'
-            'level INTEGER NOT NULL DEFAULT 2'
+            'level INTEGER DEFAULT 2,'
             'createdAt TIMESTAMP,'
-            'FOREIGN KEY(level) REFERENCES userLevel(level_id)';
-
+            'FOREIGN KEY(level) REFERENCES userLevel(level_id)'
+            ')';
         await db.execute(reqUser);
         final reqTonIsertOneUser = 'INSERT INTO user VALUES('
             'null, "gnanagobrice@gmail.com", '
-            '"%mamson%", 1, 2,'
+            '"%mamson%", 1, 3,'
             'strftime("%d-%m-%Y %H:%M:%S", datetime("now")))';
         await db.execute(reqTonIsertOneUser);
+
+      final String reqCustomer = 'CREATE TABLE customer(customer_id integer primary key autoincrement not NULL,'
+                          'fullname Text, email_address Text, createdAt timestamp)';
+      await db.execute(reqCustomer);
+
 
         // Creation de la table operation : elle define le type de l'opération
         final String reqOperation = 'CREATE TABLE operation('
             'operation_id INTEGER PRIMARY KEY AUTOINCREMENT,'
             'title TEXT,'
-            'description TEXT,'
+            'description TEXT'
             ')';
         await db.execute(reqOperation);
 

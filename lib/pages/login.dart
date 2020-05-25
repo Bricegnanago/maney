@@ -9,6 +9,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>(); 
    final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   // User user;
@@ -18,6 +19,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: Container(
@@ -178,7 +180,7 @@ class _LoginState extends State<Login> {
                             ),
                             onPressed: () {                              
                                 submitUser(context);                                
-                                // print('Hello world');                              
+                                // print('Hello world');
                             },
                           )),
                       SizedBox(
@@ -229,6 +231,19 @@ class _LoginState extends State<Login> {
           //     },
           //   ),
           // );
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              elevation: 10,
+              content: Text("Données d'authentification incorrecte",
+              textAlign: TextAlign.center , 
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,                                
+              ),
+              ),
+              backgroundColor: Colors.redAccent,            
+              ),
+          );
           print("Acces refuse");
           
         }

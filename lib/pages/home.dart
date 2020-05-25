@@ -26,6 +26,16 @@ class _HomeState extends State<Home> {
           )
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.person_add, color: Colors.white,),
+        onPressed: (){
+          // afficher une modal pour un nouveau client
+
+        },
+        elevation: 30,
+        backgroundColor: Colors.deepPurple[400],
+        
+      ),
       drawer: DrawerWidget(userData: data["username"])
     );
   }

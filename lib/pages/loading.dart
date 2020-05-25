@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';
 import 'package:maney/pages/login.dart';
+// import 'package:maney/models/DbManager.dart';
 
 class Loading extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class _LoadingState extends State<Loading> {
   
   @override
   Widget build(BuildContext context) {
+    // DbUserManager db = DbUserManager();
     return new SplashScreen(
       title: new Text(
         'Welcome In SplashScreen',

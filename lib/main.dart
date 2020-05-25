@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         '/analytics': (context) => Analytics(),
         '/login': (context) => Login(),
         '/story': (context) => Story(),
-        '/settings.dart' : (context) => Settings(),
+        '/settings' : (context) => Settings(),
       },
     );
   }
