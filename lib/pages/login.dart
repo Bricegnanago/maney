@@ -9,8 +9,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>(); 
-   final _usernameController = TextEditingController();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   // User user;
   final _formKey = GlobalKey<FormState>();
@@ -19,7 +19,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+        key: _scaffoldKey,
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: Container(
@@ -123,7 +123,7 @@ class _LoginState extends State<Login> {
                                       controller: _usernameController,
                                       validator: (value) => value.isNotEmpty
                                           ? null
-                                          : "Ce champs est requis",
+                                          : "Champ de saisie obligatoire",
                                       decoration: InputDecoration(
                                           border: InputBorder.none,
                                           hintText:
@@ -178,9 +178,9 @@ class _LoginState extends State<Login> {
                                 ),
                               ),
                             ),
-                            onPressed: () {                              
-                                submitUser(context);                                
-                                // print('Hello world');
+                            onPressed: () {
+                              submitUser(context);
+                              // print('Hello world');
                             },
                           )),
                       SizedBox(
@@ -205,59 +205,50 @@ class _LoginState extends State<Login> {
   void submitUser(BuildContext context) {
     if (_formKey.currentState.validate()) {
       //afficher un snackbar si l'utilsateur existe déjà
-      
+
       //recupération des données
-      User user = User(username: _usernameController.text, password: _passwordController.text);    
-      
+      User user = User(
+          username: _usernameController.text,
+          password: _passwordController.text);
+
       // print("username : ${user.username}");
       // print("username :");
       _usernameController.clear();
       _passwordController.clear();
       dbusermanager.isLogged(user).then((id) {
         if (id) {
-          Navigator.pushReplacementNamed(
-              context, '/home', arguments: {
-                "username" : user.username
-              }); //accès à la page d'acceuil
+          Navigator.pushReplacementNamed(context, '/home', arguments: {
+            "username": user.username
+          }); //accès à la page d'acceuil
           print('Acces autorise');
         } else {
-          // msg = "Connexion échouée";
-          // final snackBar = SnackBar(
-          //   content: Text(msg),
-          //   action: SnackBarAction(
-          //     label: 'Cacher',
-          //     onPressed: () {
-          //       // Some code to undo the change.
-          //     },
-          //   ),
-          // );
           _scaffoldKey.currentState.showSnackBar(
             SnackBar(
               elevation: 10,
-              content: Text("Données d'authentification incorrecte",
-              textAlign: TextAlign.center , 
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,                                
+              content: Text(
+                "Données d'authentification incorrecte",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
               ),
-              ),
-              backgroundColor: Colors.redAccent,            
-              ),
+              backgroundColor: Colors.redAccent,
+            ),
           );
           print("Acces refuse");
-          
         }
-      // });
+        // });
 
-      // dbusermanager.insertUser(user).then((id) {
-      //   if(id>0){
-      //     print("identifiant : : $id");
-      //   }else{
-      //     print("Une erreur");
-      //   }
-            
-          // print('Acces refuse');
-          // Scaffold.of(context).showSnackBar(snackBar);
+        // dbusermanager.insertUser(user).then((id) {
+        //   if(id>0){
+        //     print("identifiant : : $id");
+        //   }else{
+        //     print("Une erreur");
+        //   }
+
+        // print('Acces refuse');
+        // Scaffold.of(context).showSnackBar(snackBar);
       });
     }
   }

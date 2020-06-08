@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:maney/models/user.dart';
+import 'package:maney/models/customer.dart';
 
 class DbUserManager {
   Database _database;
@@ -44,10 +45,10 @@ class DbUserManager {
             'strftime("%d-%m-%Y %H:%M:%S", datetime("now")))';
         await db.execute(reqTonIsertOneUser);
 
-      final String reqCustomer = 'CREATE TABLE customer(customer_id integer primary key autoincrement not NULL,'
-                          'fullname Text, email_address Text, createdAt timestamp)';
-      await db.execute(reqCustomer);
-
+        final String reqCustomer =
+            'CREATE TABLE customer(customerId INTEGER PRIMARY KEY AUTOINCREMENT,'
+            'fullName TEXT, emailAddress TEXT DEFAULT NULL, phoneNumber TEXT , createdAt timestamp)';
+        await db.execute(reqCustomer);
 
         // Creation de la table operation : elle define le type de l'opération
         final String reqOperation = 'CREATE TABLE operation('
@@ -57,13 +58,13 @@ class DbUserManager {
             ')';
         await db.execute(reqOperation);
 
-        // creation du compte client
+        // creation du compte customer
         final String reqCreateCustomerAccount = 'CREATE TABLE account('
             'account_id INTEGER PRIMARY KEY AUTOINCREMENT,'
             'user_id intEGER, owner_account integer,'
             'balance REAL, createdAt timestamp,lastUpdate timestamp,'
             'FOREIGN KEY(user_id) REFERENCES user(user_id),'
-            'FOREIGN KEY(owner_account) REFERENCES customer(customer_id))';
+            'FOREIGN KEY(owner_account) REFERENCES customer(customerId))';
 
         await db.execute(reqCreateCustomerAccount);
         //INSERTION DE DIFFERENTES OPERATION
@@ -75,14 +76,14 @@ class DbUserManager {
         // Creation de la table des historiques
         final String reqStory = 'CREATE TABLE story('
             'story_id integer PRIMARY KEY AUTOINCREMENT not null,'
-            'customer_id integer,'
+            'customerId integer,'
             'user_id integer,'
             'amount real,'
             'operation_id integer,'
             'dateOfCredit TIMESTAMP,'
             'cancelCredit timestamp NULL,'
             'FOREIGN KEY(operation_id) REFERENCES operation(operation_id),'
-            'FOREIGN KEY(customer_id) REFERENCES customer(customer_id)'
+            'FOREIGN KEY(customerId) REFERENCES customer(customerId)'
             ')';
         await db.execute(reqStory);
       });
@@ -98,7 +99,7 @@ Cette fonction returne un entier
   Future<bool> isUserExist(User user) async {
     // String sql = "SELECT COUT(*) FROM user";
     //obtenir la liste de tous les utilisateurs
-
+    openDb();
     List<Map<String, dynamic>> users = await _database
         .query("user", where: 'username = ?', whereArgs: [user.username]);
     if (users.length == 1) {
@@ -147,6 +148,7 @@ insert un client dans la base e données
     return await _database.delete("user", where: "id = ? ", whereArgs: [id]);
   }
 
+// Vérifie si l'utilisateur est loggé
   Future<bool> isLogged(User user) async {
     // String sql = "SELECT COUT(*) FROM user";
     //obtenir la liste de tous les utilisateurs
@@ -159,5 +161,73 @@ insert un client dans la base e données
       }
     }
     return false;
+  }
+
+  Future<bool> isCustomerExist(Customer customer) async {
+    openDb();
+    List<Map<String, dynamic>> users = await _database.query("customer",
+        where: 'fullName = ? OR phoneNumber = ?',
+        whereArgs: [customer.fullName, customer.phoneNumber]);
+
+    if (users.length == 1) {
+      return false; // Le clietnt existe déjà - Enregistrement interdit
+    } else {
+      return true; // Enregistrement autorisé
+    }
+  }
+
+  Future<int> insertCustomer(Customer customer) async {
+    await openDb();
+    // bool flag = await isCustomerExist(customer);
+    return await _database.insert('customer', customer.toMap());
+  }
+
+  Future<bool> isPhoneNumberOfCustomerExist(Customer customer) async {
+    // String sql = "SELECT COUT(*) FROM user";
+    //obtenir la liste de tous les utilisateurs
+    await openDb();
+    List<Map<String, dynamic>> users = await _database.query("customer",
+        where: 'phoneNumber= ?', whereArgs: [customer.phoneNumber]);
+    if (users.length == 1) {
+      return true; //Enregistrement interdit
+    } else {
+      return false; //Enregistrement autorisé
+    }
+    // return 0 : return 1;
+  }
+
+  Future<bool> isFullNameOfCustomerExist(Customer customer) async {
+    // String sql = "SELECT COUT(*) FROM user";
+    //obtenir la liste de tous les utilisateurs
+    await openDb();
+    List<Map<String, dynamic>> users = await _database.query("customer",
+        where: 'fullName= ?', whereArgs: [customer.fullName]);
+    if (users.length == 1) {
+      return true; //Enregistrement interdit
+    } else {
+      return false; //Enregistrement autorisé
+    }
+    // return 0 : return 1;
+  }
+
+  // Toute la liste des utilisateurs
+  Future<List<Customer>> getListCustomer() async {
+    await openDb();
+    final List<Map<String, dynamic>> maps =
+        await _database.query("customer", orderBy: " customerId DESC");
+    return List.generate(
+        maps.length,
+        (index) => Customer(
+              customerId: maps[index]["customerId"],
+              fullName: maps[index]["fullName"],
+              phoneNumber: maps[index]["phoneNumber"],
+            ));
+  }
+
+  // Supprimer un client
+  Future<int> deleteCustomer(int id) async {
+    await openDb();
+    return await _database
+        .delete("customer", where: "customerId = ? ", whereArgs: [id]);
   }
 }

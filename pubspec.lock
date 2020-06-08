@@ -37,7 +37,7 @@ packages:
     source: hosted
     version: "2.0.0"
   cached_network_image:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: cached_network_image
       url: "https://pub.dartlang.org"
@@ -116,13 +116,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  hash:
-    dependency: "direct main"
-    description:
-      name: hash
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.3"
   http:
     dependency: transitive
     description:
@@ -151,6 +144,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
+  mask_text_input_formatter:
+    dependency: "direct main"
+    description:
+      name: mask_text_input_formatter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.6"
   matcher:
     dependency: transitive
     description:

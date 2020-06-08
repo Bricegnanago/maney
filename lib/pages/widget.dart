@@ -3,9 +3,9 @@ import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 
 // import 'package:cached_network_image/cached_network_image.dart';
 class DrawerWidget extends StatelessWidget {
-  final String userData;
+  // final String userData;
 
-  DrawerWidget({this.userData});
+  DrawerWidget();
   @override
   Widget build(BuildContext context) {
     return Drawer(      
@@ -41,27 +41,25 @@ class DrawerWidget extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(
-              Icons.account_box,
-              size: 22,
+              Icons.home,
+              size: 20,
             ),
             title: Text(
-              'Mon Compte',
-              style: TextStyle(fontSize: 22),
+              'Accueil',
+              style: TextStyle(fontSize: 20),
             ),
             onTap: () {
-              Navigator.pop(context);
-              //redirection vers la page d'accueil
-              // Navigator.popAndPushNamed(context, '/home');
+              Navigator.popAndPushNamed(context, '/home');
             },
           ),
           ListTile(
             leading: Icon(
               Icons.date_range,
-              size: 22,
+              size: 20,
             ),
             title: Text(
               'Historique',
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 20),
             ),
             onTap: () {
               //Redirection vers la page des historique
@@ -71,11 +69,11 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             leading: Icon(
               Icons.equalizer,
-              size: 22,
+              size: 20,
             ),
             title: Text(
               'Statisque',
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 20),
             ),
             onTap: () {
               // Update the state of the app
@@ -87,11 +85,11 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             leading: Icon(
               Icons.settings,
-              size: 22,
+              size: 20,
             ),
             title: Text(
               'Paramètre',
-              style: TextStyle(fontSize: 22),
+              style: TextStyle(fontSize: 20),
             ),
             onTap: () {
               // Update the state of the app
@@ -107,9 +105,9 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             leading: Icon(
               Icons.settings_power,
-              size: 22,
+              size: 20,
             ),
-            title: Text('Deconnexion', style: TextStyle(fontSize: 22)),
+            title: Text('Deconnexion', style: TextStyle(fontSize: 20)),
             onTap: () {
               //L'utilisateur se déconnecte
 

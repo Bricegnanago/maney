@@ -28,8 +28,8 @@ dependencies:
   splashscreen: ^1.2.0
   animated_text_kit: ^2.0.1
   circular_profile_avatar: ^1.0.6
-  hash: ^1.0.3
-  cached_network_image: ^2.2.0+1
+  mask_text_input_formatter: ^1.0.6  
+  
   # kf_drawer: ^1.1.2
 
 
