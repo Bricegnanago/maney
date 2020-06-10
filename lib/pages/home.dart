@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maney/models/DbManager.dart';
 import 'package:maney/models/customer.dart';
+import 'package:maney/models/account.dart';
+import 'package:maney/models/info_customer.dart';
 import 'package:maney/pages/widget.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -18,6 +20,9 @@ class _HomeState extends State<Home> {
   final _amountController = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   Customer customer = Customer(fullName: "", phoneNumber: "");
+  Account account =
+      Account(accountId: null, userId: null, ownerAccount: null, balance: null);
+  List<InfoCustomerUserAccount> infos;
   DbUserManager dbusermanager = DbUserManager();
   List<Customer> customers;
   bool isValidate = false;
@@ -33,7 +38,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    // final Map data = ModalRoute.of(context).settings.arguments;
+    final Map data = ModalRoute.of(context).settings.arguments;
     // double width = MediaQuery.of(context).size.width;
     return Scaffold(
         key: _scaffoldKey,
@@ -53,74 +58,53 @@ class _HomeState extends State<Home> {
         ),
         body: FutureBuilder(
           //obtenir la liste
-          future: dbusermanager.getListCustomer(),
+          future: dbusermanager.getInfoCustomerUserAccount(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               //donnee bien recu
-              customers = snapshot.data;
+              infos = snapshot.data;
+              print("*************** info lenght : ${infos.length}");
               return ListView.builder(
                   shrinkWrap: true,
-                  itemCount: (customers.length == null) ? 0 : customers.length,
+                  itemCount: (infos.length == null) ? 0 : infos.length,
                   itemBuilder: (BuildContext context, int index) {
-                    Customer customer = customers[index];
+                    InfoCustomerUserAccount info = infos[index];
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        ListTile(
-                          contentPadding: EdgeInsets.fromLTRB(15, 5, 15, 5),
-                          onTap: () {
-                            print("Nom : ${customer.fullName}");
-                          },
-                          leading: Icon(Icons.person),
-                          title: Text(
-                            'Nom: ${customer.fullName}',
-                            style: TextStyle(fontSize: 19),
+                        Card(
+                          margin: EdgeInsets.all(1),
+                          elevation: 1,
+                          child: ListTile(
+                            contentPadding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                            onTap: () {
+                              print("${info.fullNameOwner}");
+                            },
+                            leading: Icon(Icons.person),
+                            title: Text(
+                              '${info.fullNameOwner}',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            subtitle: Text('${info.phoneNumberOwner}',
+                                style: TextStyle(
+                                    fontSize: 15, color: Colors.grey)),
+                            trailing: Container(
+                              width: 50,
+                              height: 30,                              
+                              child: Center(
+                                child: Text('${info.balance}',
+                                    style: TextStyle(
+                                      color: Colors.deepPurple,
+                                      fontSize: 15,                                      
+                                      fontWeight: FontWeight.bold,
+                                    )),
+                              ),
+                            ),
                           ),
-                          subtitle: Text('Numéro: ${customer.phoneNumber}',
-                              style:
-                                  TextStyle(fontSize: 19, color: Colors.grey)),
-                        ),
-                        Divider(),
+                        ),              
                       ],
-                    );
-
-                    // return Card(
-                    //   child: Padding(
-                    //     padding: const EdgeInsets.all(15.0),
-                    //     child: Row(
-                    //       children: <Widget>[
-                    //         Container(
-                    //           width: width * 0.6,
-                    //           child: Column(
-                    //             crossAxisAlignment: CrossAxisAlignment.start,
-                    //             children: <Widget>[],
-                    //           ),
-                    //         ),
-                    //         // IconButton(
-                    //         //     icon: Icon(Icons.edit),
-                    //         //     color: Colors.blueAccent,
-                    //         //     onPressed: () {
-                    //         //       _fullNameController.text = customer.fullName;
-                    //         //       _phoneNumberController.text =
-                    //         //           customer.phoneNumber;
-                    //         //       // student = st;
-                    //         //       // updateIndex = index;
-                    //         //     }),
-                    //         IconButton(
-                    //             icon: Icon(Icons.delete),
-                    //             color: Colors.redAccent,
-                    //             onPressed: () {
-                    //               dbusermanager
-                    //                   .deleteCustomer(customer.customerId);
-                    //               setState(() {
-                    //                 customers.removeAt(index);
-                    //               });
-                    //             })
-                    //       ],
-                    //     ),
-                    //   ),
-                    // );
+                    );                    
                   });
             }
             return CircularProgressIndicator();
@@ -139,7 +123,9 @@ class _HomeState extends State<Home> {
           elevation: 30,
           backgroundColor: Colors.deepPurple[400],
         ),
-        drawer: DrawerWidget());
+        drawer: DrawerWidget(
+          userData: data["username"],
+        ));
   }
 
   void showDialo() {
@@ -187,7 +173,6 @@ class _HomeState extends State<Home> {
                                     bottom:
                                         BorderSide(color: Colors.grey[100]))),
                             child: TextFormField(
-                              
                               controller: _phoneNumberController,
                               inputFormatters: [maskTextInputFormatter],
                               autocorrect: false,
@@ -249,8 +234,7 @@ class _HomeState extends State<Home> {
                                   flex: 2,
                                   child: RaisedButton(
                                     onPressed: () {
-                                      submitCustomer(context);
-                                      // Navigator.pop(context);
+                                      submitCustomer(context);                                   
                                       print("validate : $isValidate");
                                     },
                                     child: Text(
@@ -279,12 +263,18 @@ class _HomeState extends State<Home> {
     if (_formToSaveClient.currentState.validate()) {
       customer.fullName = _fullNameController.text;
       customer.phoneNumber = _phoneNumberController.text;
+      account.balance = double.parse(_amountController.text);
       //Inserer dans la base de donnée et actualiser la liste de client
       dbusermanager.isCustomerExist(customer).then((value) {
         if (value) {
           dbusermanager.insertCustomer(customer).then((customerId) {
-            print('id : $customerId');
+            print('customerid : $customerId');
+            account.ownerAccount = customerId;
             if (!customerId.isNaN) {
+              dbusermanager
+                  .initAccountCustomer(account)
+                  .then((accountId) => print("accountId $accountId"))
+                  .catchError((onError) => print("Erreur : $onError"));
               setState(() {
                 isValidate = true;
                 message = "Nouveau client enregistré avec succès";
@@ -315,7 +305,7 @@ class _HomeState extends State<Home> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 16,
                     ),
                   ),
                   backgroundColor: Colors.redAccent,
@@ -336,7 +326,7 @@ class _HomeState extends State<Home> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
               backgroundColor: Colors.redAccent,
@@ -344,25 +334,10 @@ class _HomeState extends State<Home> {
           );
         }
       });
-
       _fullNameController.clear();
       _phoneNumberController.clear();
       _amountController.clear();
       Navigator.pop(context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     elevation: 10,
-      //     content: Text(
-      //       message,
-      //       textAlign: TextAlign.center,
-      //       style: TextStyle(
-      //         color: Colors.white,
-      //         fontSize: 18,
-      //       ),
-      //     ),
-      //     backgroundColor: (isValidate) ? Colors.greenAccent : Colors.redAccent,
-      //   ),
-      // );
     }
   }
 }

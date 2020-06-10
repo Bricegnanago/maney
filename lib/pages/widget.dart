@@ -3,17 +3,17 @@ import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 
 // import 'package:cached_network_image/cached_network_image.dart';
 class DrawerWidget extends StatelessWidget {
-  // final String userData;
+  final String userData;
 
-  DrawerWidget();
+  DrawerWidget({this.userData});
   @override
   Widget build(BuildContext context) {
-    return Drawer(      
+    return Drawer(
       child: ListView(
         // Important: Remove any padding from the ListView.
         padding: EdgeInsets.zero,
         children: <Widget>[
-          DrawerHeader(            
+          DrawerHeader(
             child: CircularProfileAvatar(
               'https://avatars0.githubusercontent.com/u/8264639?s=460&v=4', //sets image path, it should be a URL string. default value is empty string, if path is empty it will display only initials
               radius: 40, // sets radius, default 50.0
@@ -49,7 +49,8 @@ class DrawerWidget extends StatelessWidget {
               style: TextStyle(fontSize: 20),
             ),
             onTap: () {
-              Navigator.popAndPushNamed(context, '/home');
+              Navigator.popAndPushNamed(context, '/home',
+                  arguments: {"username": this.userData});
             },
           ),
           ListTile(
@@ -63,7 +64,8 @@ class DrawerWidget extends StatelessWidget {
             ),
             onTap: () {
               //Redirection vers la page des historique
-              Navigator.popAndPushNamed(context, '/story');
+              Navigator.popAndPushNamed(context, '/story',
+                  arguments: {"username": this.userData});
             },
           ),
           ListTile(
@@ -79,7 +81,8 @@ class DrawerWidget extends StatelessWidget {
               // Update the state of the app
               // ...
               // Then close the drawer
-              Navigator.popAndPushNamed(context, '/analytics');
+              Navigator.popAndPushNamed(context, '/analytics',
+                  arguments: {"username": this.userData});
             },
           ),
           ListTile(
@@ -96,7 +99,8 @@ class DrawerWidget extends StatelessWidget {
               // ...
               // Then close the drawer
               // Navigator.pop(context);
-              Navigator.popAndPushNamed(context, '/settings');
+              Navigator.popAndPushNamed(context, '/settings',
+                  arguments: {"username": this.userData});
             },
           ),
           SizedBox(
@@ -111,7 +115,10 @@ class DrawerWidget extends StatelessWidget {
             onTap: () {
               //L'utilisateur se déconnecte
 
-              Navigator.popAndPushNamed(context, '/login');
+              Navigator.popAndPushNamed(
+                context,
+                '/login',
+              );
             },
           )
         ],

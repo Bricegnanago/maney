@@ -8,22 +8,22 @@ class Customer {
   String fullName;
   String phoneNumber;
   String emailAddress;
-  String createdAt;
+  String customerCreatedAt;
   Customer({
     this.customerId,
     @required this.fullName,
     @required this.phoneNumber,
     this.emailAddress,
-    this.createdAt,
+    this.customerCreatedAt,
   });
 
   Map<String, dynamic> toMap() {
     return {
       "customerId": customerId,
-      "fullName": fullName,
-      "phoneNumber": phoneNumber,
+      "fullName": fullName.toUpperCase(),
+      "phoneNumber": phoneNumber.toUpperCase(),
       "emailAddress": emailAddress,
-      "createdAt": createdAt,
+      "customerCreatedAt": customerCreatedAt,
     };
   }
 }

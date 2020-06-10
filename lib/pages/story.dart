@@ -11,6 +11,7 @@ class Story extends StatefulWidget {
 class _StoryState extends State<Story> {
   @override
   Widget build(BuildContext context) {
+    final Map data = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
         title: Text("Historique d'activité"),
@@ -25,7 +26,7 @@ class _StoryState extends State<Story> {
           )
         ),
       ),
-      drawer: DrawerWidget()
+            drawer: DrawerWidget(userData: data["username"],)
     );
   }
 }

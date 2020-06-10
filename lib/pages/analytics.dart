@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maney/pages/widget.dart';
 
-
 class Analytics extends StatefulWidget {
   @override
   _AnalyticsState createState() => _AnalyticsState();
@@ -11,22 +10,19 @@ class Analytics extends StatefulWidget {
 class _AnalyticsState extends State<Analytics> {
   @override
   Widget build(BuildContext context) {
+    final Map data = ModalRoute.of(context).settings.arguments;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Analyse des données'),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurpleAccent[400],
-      ),
-      body: Center(
-        child: Text(      
-          'Analyse statistiques',          
-          textAlign: TextAlign.center,
-          style: TextStyle(
-          fontSize: 30
-          )
+        appBar: AppBar(
+          title: Text('Analyse des données'),
+          centerTitle: true,
+          backgroundColor: Colors.deepPurpleAccent[400],
         ),
-      ),
-      drawer: DrawerWidget()
-    );
+        body: Center(
+          child: Text('Analyse statistiques',
+              textAlign: TextAlign.center, style: TextStyle(fontSize: 30)),
+        ),
+        drawer: DrawerWidget(
+          userData: data["username"],
+        ));
   }
 }

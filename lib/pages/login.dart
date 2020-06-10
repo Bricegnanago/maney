@@ -217,9 +217,11 @@ class _LoginState extends State<Login> {
       _passwordController.clear();
       dbusermanager.isLogged(user).then((id) {
         if (id) {
-          Navigator.pushReplacementNamed(context, '/home', arguments: {
-            "username": user.username
-          }); //accès à la page d'acceuil
+          dbusermanager
+              .getIdOfUser(user.username)
+              .then((value) => user.userId = value);
+          Navigator.pushReplacementNamed(context, '/home',
+              arguments: user.toMap()); //accès à la page d'acceuil
           print('Acces autorise');
         } else {
           _scaffoldKey.currentState.showSnackBar(

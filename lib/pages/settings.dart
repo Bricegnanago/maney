@@ -9,8 +9,10 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  
   @override
   Widget build(BuildContext context) {
+  final Map data = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
         title: Text("Gérer les comptes"),
@@ -25,7 +27,7 @@ class _SettingsState extends State<Settings> {
           )
         ),
       ),
-      drawer: DrawerWidget()
+      drawer: DrawerWidget(userData: data["username"],)
     );
   }
 }
