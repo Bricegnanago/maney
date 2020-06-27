@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 // la classe utilisateur avec toutes ses propriété
 class Customer {
   int customerId;
-  String fullName;
+  String fullName;  
   String phoneNumber;
   String emailAddress;
   String customerCreatedAt;
+  
   Customer({
     this.customerId,
     @required this.fullName,
@@ -18,10 +19,11 @@ class Customer {
   });
 
   Map<String, dynamic> toMap() {
+    // customerCreatedAt = strftime("%d-%m-%Y %H:%M:%S", datetime("now"));
     return {
       "customerId": customerId,
-      "fullName": fullName.toUpperCase(),
-      "phoneNumber": phoneNumber.toUpperCase(),
+      "fullName": fullName.toLowerCase(),
+      "phoneNumber": phoneNumber,
       "emailAddress": emailAddress,
       "customerCreatedAt": customerCreatedAt,
     };

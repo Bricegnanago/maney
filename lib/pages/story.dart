@@ -12,6 +12,8 @@ class _StoryState extends State<Story> {
   @override
   Widget build(BuildContext context) {
     final Map data = ModalRoute.of(context).settings.arguments;
+  print('parametre : data: $data');
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Historique d'activité"),

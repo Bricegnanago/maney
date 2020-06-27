@@ -5,6 +5,7 @@ import 'package:maney/models/DbManager.dart';
 import 'package:maney/models/customer.dart';
 import 'package:maney/models/account.dart';
 import 'package:maney/models/info_customer.dart';
+// import 'package:maney/pages/story.dart';
 import 'package:maney/pages/widget.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -20,8 +21,14 @@ class _HomeState extends State<Home> {
   final _amountController = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   Customer customer = Customer(fullName: "", phoneNumber: "");
-  Account account =
-      Account(accountId: null, userId: null, ownerAccount: null, balance: null);
+  InfoCustomerUserAccount storyInfo = InfoCustomerUserAccount(amount: 0);
+  Account account = Account(
+      accountId: null,
+      userId: null,
+      ownerAccount: null,
+      balance: 0,
+      operationId: null,
+      accountCreatedAt: null);
   List<InfoCustomerUserAccount> infos;
   DbUserManager dbusermanager = DbUserManager();
   List<Customer> customers;
@@ -39,13 +46,18 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final Map data = ModalRoute.of(context).settings.arguments;
+    account.userId = data["userId"];
     // double width = MediaQuery.of(context).size.width;
+    print('********data userId : $data');
+    // print('********data userId : $data');
+
     return Scaffold(
+      // backgroundColor: Color.fromRGBO(r, g, b, opacity),
         key: _scaffoldKey,
         appBar: AppBar(
-          title: Text('Accueil'),
+          title: Text(''),
           centerTitle: true,
-          backgroundColor: Colors.deepPurpleAccent[400],
+          // backgroundColor: Colors.deepPurpleAccent[400],
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.search),
@@ -64,11 +76,15 @@ class _HomeState extends State<Home> {
               //donnee bien recu
               infos = snapshot.data;
               print("*************** info lenght : ${infos.length}");
+              // print('********* ${infos[0].fullNameOwner}');
               return ListView.builder(
                   shrinkWrap: true,
                   itemCount: (infos.length == null) ? 0 : infos.length,
                   itemBuilder: (BuildContext context, int index) {
                     InfoCustomerUserAccount info = infos[index];
+
+                    info.fullNameOwner = info.fullNameOwner[0].toUpperCase() +
+                        info.fullNameOwner.substring(1);
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -77,9 +93,12 @@ class _HomeState extends State<Home> {
                           margin: EdgeInsets.all(1),
                           elevation: 1,
                           child: ListTile(
-                            contentPadding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                            contentPadding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                             onTap: () {
-                              print("${info.fullNameOwner}");
+                              print("owner : ${info.idOwner}");
+                              Navigator.pushNamed(context, '/update_account', arguments: {
+                                "userData" : data,
+                                "customerInfo": info});
                             },
                             leading: Icon(Icons.person),
                             title: Text(
@@ -90,21 +109,21 @@ class _HomeState extends State<Home> {
                                 style: TextStyle(
                                     fontSize: 15, color: Colors.grey)),
                             trailing: Container(
-                              width: 50,
-                              height: 30,                              
+                              width: 100,
+                              height: 250,
                               child: Center(
                                 child: Text('${info.balance}',
                                     style: TextStyle(
                                       color: Colors.deepPurple,
-                                      fontSize: 15,                                      
+                                      fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                     )),
                               ),
                             ),
                           ),
-                        ),              
+                        ),
                       ],
-                    );                    
+                    );
                   });
             }
             return CircularProgressIndicator();
@@ -119,9 +138,10 @@ class _HomeState extends State<Home> {
             // afficher une modal pour un nouveau client
             //On enregistre un nouvel utilisateur
             showDialo();
+            // Navigator.pushNamed(context, "/save_customer");
           },
           elevation: 30,
-          backgroundColor: Colors.deepPurple[400],
+          // backgroundColor: Colors.deepPurple[400],
         ),
         drawer: DrawerWidget(
           userData: data["username"],
@@ -148,6 +168,19 @@ class _HomeState extends State<Home> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(10.0),
+
+                            color: Colors.deepPurpleAccent[400],                            
+                            child: Text(
+                              'Creation de compte',
+                              textAlign: TextAlign.center, style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                              ),
+                            ),
+                          ),
                           Container(
                             padding: EdgeInsets.all(8.0),
                             decoration: BoxDecoration(
@@ -234,7 +267,7 @@ class _HomeState extends State<Home> {
                                   flex: 2,
                                   child: RaisedButton(
                                     onPressed: () {
-                                      submitCustomer(context);                                   
+                                      submitCustomer(context);
                                       print("validate : $isValidate");
                                     },
                                     child: Text(
@@ -260,21 +293,29 @@ class _HomeState extends State<Home> {
 
   void submitCustomer(BuildContext context) {
     //vérifier si le formulaire à été soumi
+    // InfoCustomerUserAccount story = InfoCustomerUserAccount();
     if (_formToSaveClient.currentState.validate()) {
       customer.fullName = _fullNameController.text;
       customer.phoneNumber = _phoneNumberController.text;
-      account.balance = double.parse(_amountController.text);
+      // storyInfo.amount = double.parse(_amountController.text);
+      // storyInfo.amount = double.parse(_amountController.text);
+      // storyInfo.userId = account.userId;
+      // storyInfo.operationId = 1;
+      //
+
+      account.balance = int.parse(_amountController.text);
       //Inserer dans la base de donnée et actualiser la liste de client
       dbusermanager.isCustomerExist(customer).then((value) {
         if (value) {
           dbusermanager.insertCustomer(customer).then((customerId) {
             print('customerid : $customerId');
             account.ownerAccount = customerId;
+            storyInfo.idOwner = customerId;
             if (!customerId.isNaN) {
               dbusermanager
                   .initAccountCustomer(account)
-                  .then((accountId) => print("accountId $accountId"))
-                  .catchError((onError) => print("Erreur : $onError"));
+                  .then((accountId) => print("accountId $accountId"));
+              // .catchError((onError) => print("Erreur : $onError"));
               setState(() {
                 isValidate = true;
                 message = "Nouveau client enregistré avec succès";
@@ -336,7 +377,7 @@ class _HomeState extends State<Home> {
       });
       _fullNameController.clear();
       _phoneNumberController.clear();
-      _amountController.clear();
+      _amountController.clear();      
       Navigator.pop(context);
     }
   }

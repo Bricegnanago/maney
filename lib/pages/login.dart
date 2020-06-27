@@ -217,12 +217,19 @@ class _LoginState extends State<Login> {
       _passwordController.clear();
       dbusermanager.isLogged(user).then((id) {
         if (id) {
-          dbusermanager
-              .getIdOfUser(user.username)
-              .then((value) => user.userId = value);
-          Navigator.pushReplacementNamed(context, '/home',
-              arguments: user.toMap()); //accès à la page d'acceuil
-          print('Acces autorise');
+          dbusermanager.getInfoUser(user.username).then((us) {
+            Map datas = user.toMap();
+
+            datas["userId"] = us.userId;
+            datas["createdAt"] = us.createdAt;
+            datas["status"] = us.status;
+            datas["level"] = us.level;
+
+            print('****** userId : ${datas["userId"]}');
+            Navigator.pushReplacementNamed(context, '/home',
+                arguments: datas); //accès à la page d'acceuil
+            print('Acces autorise');
+          });
         } else {
           _scaffoldKey.currentState.showSnackBar(
             SnackBar(
@@ -240,17 +247,6 @@ class _LoginState extends State<Login> {
           );
           print("Acces refuse");
         }
-        // });
-
-        // dbusermanager.insertUser(user).then((id) {
-        //   if(id>0){
-        //     print("identifiant : : $id");
-        //   }else{
-        //     print("Une erreur");
-        //   }
-
-        // print('Acces refuse');
-        // Scaffold.of(context).showSnackBar(snackBar);
       });
     }
   }

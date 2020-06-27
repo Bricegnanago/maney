@@ -13,6 +13,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
   final Map data = ModalRoute.of(context).settings.arguments;
+  print('settings : data : $data');
     return Scaffold(
       appBar: AppBar(
         title: Text("Gérer les comptes"),

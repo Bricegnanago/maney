@@ -35,21 +35,19 @@ class DbUserManager {
             'userId INTEGER PRIMARY KEY AUTOINCREMENT,'
             'username TEXT NOT NULL,'
             'password TEXT NOT NULL,'
-            'status INTEGER DEFAULT 1,'
-            'level INTEGER DEFAULT 2,'
+            'status INTEGER, '
+            'level INTEGER, '
             'createdAt TIMESTAMP,'
-            'FOREIGN KEY(level) REFERENCES userLevel(levelId)'
+            ' FOREIGN KEY(level) REFERENCES userLevel(levelId)'
             ')';
         await db.execute(reqUser);
-        final reqTonIsertOneUser = 'INSERT INTO user VALUES('
-            'null, "gnanagobrice@gmail.com", '
-            '"%mamson%", 1, 3,'
-            'strftime("%d-%m-%Y %H:%M:%S", datetime("now")))';
+        final reqTonIsertOneUser =
+            'INSERT INTO user VALUES(null, "gnanagobrice", "mamson", 1, 3, strftime("%d-%m-%Y %H:%M:%S", datetime("now")))';
         await db.execute(reqTonIsertOneUser);
 
         final String reqCustomer =
             'CREATE TABLE customer(customerId INTEGER PRIMARY KEY AUTOINCREMENT,'
-            'fullName TEXT, emailAddress TEXT DEFAULT NULL, phoneNumber TEXT , customerCreatedAt timestamp)';
+            ' fullName TEXT, emailAddress TEXT DEFAULT NULL, phoneNumber TEXT , customerCreatedAt timestamp)';
         await db.execute(reqCustomer);
 
         // Creation de la table operation : elle define le type de l'opération
@@ -64,9 +62,11 @@ class DbUserManager {
         final String reqCreateCustomerAccount = 'CREATE TABLE account('
             'accountId INTEGER PRIMARY KEY AUTOINCREMENT,'
             'userId INTEGER, ownerAccount integer,'
-            'balance REAL, accountCreatedAt timestamp,accountLastUpdate timestamp,'
+            'operationId int, '
+            'balance INTEGER, accountCreatedAt timestamp,accountLastUpdate timestamp,'
             'FOREIGN KEY(userId) REFERENCES user(userId),'
-            'FOREIGN KEY(ownerAccount) REFERENCES customer(customerId))';
+            'FOREIGN KEY(ownerAccount) REFERENCES customer(customerId)'
+            'FOREIGN KEY(operationId) REFERENCES operation(operationId))';
 
         await db.execute(reqCreateCustomerAccount);
         //INSERTION DE DIFFERENTES OPERATION
@@ -80,10 +80,9 @@ class DbUserManager {
             'storyId integer PRIMARY KEY AUTOINCREMENT not null,'
             'customerId integer,'
             'userId integer,'
-            'amount real,'
+            'amount INTEGER,'
             'operationId integer,'
-            'dateOfCredit TIMESTAMP,'
-            'cancelCredit timestamp NULL,'
+            'dateOfOpe TIMESTAMP,'
             'FOREIGN KEY(operationId) REFERENCES operation(operationId),'
             'FOREIGN KEY(customerId) REFERENCES customer(customerId)'
             ')';
@@ -134,6 +133,9 @@ insert un client dans la base e données
               userId: maps[index]["userId"],
               username: maps[index]["username"],
               password: maps[index]["password"],
+              createdAt: maps[index]["createdAt"],
+              status: maps[index]["status"],
+              level: maps[index]["level"],
             ));
   }
 
@@ -142,6 +144,13 @@ insert un client dans la base e données
     await openDb();
     return await _database.update("user", user.toMap(),
         where: "userId = ?", whereArgs: [user.userId]);
+  }
+
+   Future<String> getUsername(int userId) async {
+    await openDb();
+    
+    List result = await _database.rawQuery("SELECT username from user WHERE userId=?", [userId]);
+    return result[0]["username"];
   }
 
   //Supprime un utlisateur de la liste
@@ -181,8 +190,18 @@ insert un client dans la base e données
 
   Future<int> insertCustomer(Customer customer) async {
     await openDb();
+    // 'CREATE TABLE customer(customerId INTEGER PRIMARY KEY AUTOINCREMENT,'
+    //         ' fullName TEXT, emailAddress TEXT DEFAULT NULL, phoneNumber TEXT , customerCreatedAt timestamp)';
     // bool flag = await isCustomerExist(customer);
-    return await _database.insert('customer', customer.toMap());
+    final sql = 'INSERT INTO customer VALUES('
+        'null, ?, ?, ?, '
+        'strftime("%d-%m-%Y %H:%M:%S", datetime("now"))'
+        ')';
+    return await _database.rawInsert(sql, [
+      customer.fullName.toLowerCase(),
+      customer.emailAddress,
+      customer.phoneNumber
+    ]);
   }
 
   Future<bool> isPhoneNumberOfCustomerExist(Customer customer) async {
@@ -244,7 +263,36 @@ insert un client dans la base e données
 
   Future<int> initAccountCustomer(Account account) async {
     await openDb();
-    return await _database.insert('account', account.toMap());
+    account.operationId = 1; // comme insertion -> on credite le compte
+    final sql = 'INSERT INTO account VALUES('
+        'null, ?, ?, ?, ?, '
+        'strftime("%d-%m-%Y %H:%M:%S", datetime("now")), '
+        'null'
+        ')';
+    return await _database.rawInsert(sql, [
+      account.userId,
+      account.ownerAccount,
+      account.operationId,
+      account.balance
+    ]);
+  }
+
+  Future<int> getBalance(int ownerAccount) async {
+    await openDb();    
+    final sql = "SELECT balance from account where ownerAccount = ?";
+    List<Map<String, dynamic>> result = await _database.rawQuery(sql, [ownerAccount]);
+    return result[0]['balance'];
+  }
+  Future<int> updateAccountCustomer(Account account) async {
+    await openDb();
+    //account.operationId = 1; // comme insertion -> on credite le compte
+    // final sql = 'INSERT INTO account VALUES('
+    //     'null, ?, ?, ?, ?, '
+    //     'strftime("%d-%m-%Y %H:%M:%S", datetime("now")), '
+    //     'null'
+    //     ')';
+  // double oldBalance = await getBalance(account.ownerAccount);
+    return await _database.update("account", {"balance" : account.balance}, where: "ownerAccount = ?", whereArgs: [account.ownerAccount]);
   }
 
   Future<int> getIdOfUser(String username) async {
@@ -253,6 +301,21 @@ insert un client dans la base e données
         .rawQuery("SELECT userId FROM user WHERE username = ?", [username]);
 
     return result[0]['userId'];
+  }
+
+  Future<User> getInfoUser(String username) async {
+    await openDb();
+    final List<Map<String, dynamic>> result = await _database
+        .query('user', where: 'username = ?', whereArgs: [username]);
+
+    return User(
+      userId: result[0]["userId"],
+      username: result[0]["username"],
+      password: result[0]["password"],
+      createdAt: result[0]["createdAt"],
+      level: result[0]["level"],
+      status: result[0]["status"],
+    );
   }
 
   // Future<Account> getListOfAccount(int id) async {
@@ -271,8 +334,15 @@ insert un client dans la base e données
         'customerCreatedAt, '
         'balance, '
         'accountCreatedAt, '
-        'accountLastUpdate '
-        'FROM customer INNER JOIN account ON customer.customerId = account.ownerAccount order by customer.customerId desc'
+        'accountLastUpdate, '
+        'title as operationTitle, '
+        "customer.customerId as idOwner,"
+        "user.userId as userId,"
+        'username '
+        'FROM customer LEFT JOIN account ON account.ownerAccount = customer.customerId '
+        ' LEFT JOIN user ON user.userId = account.userId '
+        ' LEFT JOIN operation ON operation.operationId = account.operationId '
+        'ORDER BY customer.customerId DESC'
 
         // 'WHERE customer.customerId = account.ownerAccount '
         // 'AND user.userId = account.userId '
@@ -289,6 +359,37 @@ insert un client dans la base e données
               balance: infos[index]["balance"],
               accountCreatedAt: infos[index]["accountCreatedAt"],
               accountLastUpdate: infos[index]["accountLastUpdate"],
+              idOwner: infos[index]["idOwner"],
+              operationTitle: infos[index]["operationTitle"],
+              username: infos[index]["username"],
             ));
   }
+
+  // final String reqStory = 'CREATE TABLE story('
+  //           'storyId integer PRIMARY KEY AUTOINCREMENT not null,'
+  //           'customerId integer,'
+  //           'userId integer,'
+  //           'amount real,'
+  //           'operationId integer,'
+  //           'dateOfCredit TIMESTAMP,'
+  //           'cancelCredit timestamp NULL,'
+  //           'FOREIGN KEY(operationId) REFERENCES operation(operationId),'
+  //           'FOREIGN KEY(customerId) REFERENCES customer(customerId)'
+  //           ')';-
+  Future<int> insertStory(InfoCustomerUserAccount storyInfo) async {
+    await openDb();
+    final sql = 'INSERT INTO story VALUES(null, ?, ?, ?, ?,'
+        'strftime("%d-%m-%Y %H:%M:%S", datetime("now"))'
+        ')';
+
+    return await _database.rawInsert(sql, [
+      storyInfo.idOwner, //ok
+      storyInfo.userId,//ok
+      storyInfo.amount, //ok
+      storyInfo.operationId,//ok
+    ]);
+  }
+
+  
+
 }

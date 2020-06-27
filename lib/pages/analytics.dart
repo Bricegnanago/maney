@@ -11,6 +11,8 @@ class _AnalyticsState extends State<Analytics> {
   @override
   Widget build(BuildContext context) {
     final Map data = ModalRoute.of(context).settings.arguments;
+      print('analytics : data username : ${data["username"]}');
+
     return Scaffold(
         appBar: AppBar(
           title: Text('Analyse des données'),
