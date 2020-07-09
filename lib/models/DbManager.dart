@@ -179,7 +179,7 @@ insert un client dans la base e données
     openDb();
     List<Map<String, dynamic>> users = await _database.query("customer",
         where: 'fullName = ? OR phoneNumber = ?',
-        whereArgs: [customer.fullName.toUpperCase(), customer.phoneNumber]);
+        whereArgs: [customer.fullName.toLowerCase(), customer.phoneNumber]);
 
     if (users.length == 1) {
       return false; // Le clietnt existe déjà - Enregistrement interdit
@@ -390,6 +390,30 @@ insert un client dans la base e données
     ]);
   }
 
-  
+  // le nombre de client enregistré
+  // 
+  Future<int> countCustomer() async {
+    await openDb();
+    final sql = 'SELECT COUNT(*) as  nbCustomer FROM customer';
+    List<Map<String, dynamic>> result = await _database.rawQuery(sql);    
+    return result[0]["nbCustomer"];
+  }
+  Future<int> totalBalance() async {
+    await openDb();
+    final sql = 'SELECT SUM(balance) as allCredit FROM account';
+    List<Map<String, dynamic>> result = await _database.rawQuery(sql);    
+    return result[0]["allCredit"];
+  }
+
+  Future<int> percentReturnedCredit() async {
+    await openDb();
+    final sql = 'SELECT count(*) as percentOfReturnedCredit FROM account where balance = 0';
+    List<Map<String, dynamic>> result = await _database.rawQuery(sql);    
+    return result[0]["percentOfReturnedCredit"];
+  }
 
 }
+
+
+
+// montant total du credit enregistré 
