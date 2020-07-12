@@ -94,7 +94,7 @@ class _AnalyticsState extends State<Analytics> {
                                           MainAxisAlignment.center,
                                       children: <Widget>[
                                         Text(
-                                          '${infoAnalytics.allCredit}',
+                                          '${infoAnalytics.allCredit} cfa',
                                           style: TextStyle(
                                               fontSize: 25,
                                               fontWeight: FontWeight.bold),
@@ -128,6 +128,8 @@ class _AnalyticsState extends State<Analytics> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               infoAnalytics.percentOfReturnedCredit = snapshot.data;
+                              final resultTemp = (infoAnalytics.effCust != 0) ? ((infoAnalytics.percentOfReturnedCredit.toDouble()/infoAnalytics.effCust.toDouble())*100) : 1.0;
+                              final result = (resultTemp != 1 ) ? resultTemp.toStringAsFixed(2) : 0;
                               return Card(
                                   elevation: 10,
                                   child: Center(
@@ -138,7 +140,7 @@ class _AnalyticsState extends State<Analytics> {
                                           MainAxisAlignment.center,
                                       children: <Widget>[
                                         Text(
-                                          '${infoAnalytics.percentOfReturnedCredit/infoAnalytics.effCust*100}%',
+                                          '$result%',
                                           style: TextStyle(
                                               fontSize: 25,
                                               fontWeight: FontWeight.bold),
