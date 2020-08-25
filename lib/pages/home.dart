@@ -179,8 +179,8 @@ class _HomeState extends State<Home> {
                                 color: Colors.white,
                                 fontSize: 18
                               ),
-                            ),
                           ),
+                        ),
                           Container(
                             padding: EdgeInsets.all(8.0),
                             decoration: BoxDecoration(

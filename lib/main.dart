@@ -7,6 +7,10 @@ import 'package:maney/pages/save_customer.dart';
 import 'package:maney/pages/story.dart';
 import 'package:maney/pages/settings.dart';
 import 'package:maney/pages/update_account.dart';
+// import 'package:maney/pages/insert_user.dart';
+import 'package:maney/pages/update_user.dart';
+import 'package:maney/pages/add_user.dart';
+
 // import 'package:maney/pages/';
 
 void main() {
@@ -30,6 +34,9 @@ class MyApp extends StatelessWidget {
         '/settings': (context) => Settings(),
         '/save_customer': (context) => SaveCustomer(),
         '/update_account': (context) => UpdateAccount(),
+        '/update_user': (context) => UpdateUser(),
+        '/add_user': (context) => AddUser(),
+        // '/admin_newUser': (context) => AdminNewUser(),
       },
     );
   }

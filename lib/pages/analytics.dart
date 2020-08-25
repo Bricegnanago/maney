@@ -68,8 +68,34 @@ class _AnalyticsState extends State<Analytics> {
                                       ],
                                     ),
                                   ));
+                            }else{
+                              infoAnalytics.effCust = 0;
+                              return Card(
+                                  elevation: 10,
+                                  child: Center(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          '${infoAnalytics.effCust}',
+                                          style: TextStyle(
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          'Clients enregistrés',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ));
                             }
-                            return CircularProgressIndicator();
+                            // return CircularProgressIndicator();
                           }),
                     ),
                   ),
@@ -100,7 +126,7 @@ class _AnalyticsState extends State<Analytics> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                         Text(
-                                          'Total credit client',
+                                          'Credit total',
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),

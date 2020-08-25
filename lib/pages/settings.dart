@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:maney/models/user.dart';
 import 'package:maney/pages/widget.dart';
 import 'package:maney/models/DbManager.dart';
 
@@ -13,111 +14,119 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     final Map data = ModalRoute.of(context).settings.arguments;
     final _scaffoldKey = GlobalKey<ScaffoldState>();
-    final _usernameController = TextEditingController();
-    final _passwordController = TextEditingController();
-    final _passwordConfirmController = TextEditingController();
+    DbUserManager dbusermanager = DbUserManager();
+    List<User> users;
     print("usernameeeee : ${data["username"]}");
-    _usernameController.text = data["username"];
-    // _passwordController.text = data["password"];
-    // User user;
-    // final _formKey = GlobalKey<FormState>();
-    // DbUserManager dbusermanager = DbUserManager();
-    var mediaQueryData = MediaQuery.of(context);
-    final cardWidth = mediaQueryData.size.width;
+
+    // var mediaQueryData = MediaQuery.of(context);
+    // final cardWidth = mediaQueryData.size.width;
+    String showLevel(int level) {
+      if (level == 3 || level == 2) {
+        print("Administrateur");
+        return "Administrateur";
+      } else {
+        print("Utilisateur");
+        return 'Utilisateur';
+      }
+    }
+
+    String showStatus(int status) {
+      print("Administrateur");
+      if (status == 1) {
+        return "Actif";
+      } else {
+        return 'Inactif';
+      }
+    }
+
     print('settings : data : $data');
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
-          title: Text("Gérer les comptes"),
+          title: Text(''),
           centerTitle: true,
-          backgroundColor: Colors.deepPurpleAccent[400],
+          // backgroundColor: Colors.deepPurpleAccent[400],
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                // Fonction de Recherche
+                // showSearch(context: context, delegate: CustomerItemSearch());
+              },
+            )
+          ],
         ),
-        body: SingleChildScrollView(
-                  child: Center(
-            child: Card(
-              elevation: 5,
-              margin: EdgeInsets.fromLTRB(15, 10, 15, 10) ,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(bottom: 30, top: 30),
-                      child: Text(
-                        'Parametrage du compte',
-                        style: TextStyle(color: Colors.deepPurple, fontSize: 20),
-                      ),
-                    ),
-                    Form(
-                      key: _scaffoldKey,
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.only(bottom: 10),                            
-                            child: TextFormField(                              
-                              // initialValue: data["username"],
-                              decoration: InputDecoration(
-                                hintText: 'Nom utilisateur',
-                                labelText: 'Nom utilisateur',
+        body: FutureBuilder(
+          //obtenir la liste
+          future: dbusermanager.getListuser(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              //donnee bien recu
+              users = snapshot.data;
+              print("*************** info lenght : ${users.length}");
+              // print('********* ${infos[0].fullNameOwner}');
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: (users.length == null) ? 0 : users.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    User user = users[index];
+
+                    user.username = user.username[0].toUpperCase() +
+                        user.username.substring(1);
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Card(
+                          margin: EdgeInsets.all(1),
+                          elevation: 1,
+                          child: ListTile(
+                            contentPadding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                            onTap: () {
+                              print("owner : ${user.username}");
+                              Navigator.pushNamed(context, '/update_user',
+                                  arguments: {
+                                    "userData": data,
+                                    "userInfo": user
+                                  });
+                            },
+                            leading: Icon(Icons.person),
+                            title: Text(
+                              '${user.username}',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            subtitle: Text('${showLevel(user.level)}',
+                                style: TextStyle(
+                                    fontSize: 15, color: Colors.grey)),
+                            trailing: Container(
+                              width: 100,
+                              height: 250,
+                              child: Center(
+                                child: Text('${showStatus(user.status)}',
+                                    style: TextStyle(
+                                      color: Colors.deepPurple,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    )),
                               ),
-                              controller: _usernameController,
-                              validator: (value) => value.isNotEmpty
-                                  ? null
-                                  : "Champ de saisie obligatoire",
-                              // initialValue: data["username"],
                             ),
                           ),
-                          Container(
-                            margin: EdgeInsets.only(bottom: 10),
-                            child: TextFormField(
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                hintText: 'Mot de passe actuel',
-                                labelText: 'Mot de passe actuel',
-                              ),
-                              controller: _passwordController,
-                              validator: (value) => value.isNotEmpty
-                                  ? null
-                                  : "Champ de saisie obligatoire",
-                              // initialValue: data["password"],
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(bottom: 10),
-                            child: TextFormField(
-                              obscureText: true,
-                              decoration: InputDecoration(                                
-                                hintText: 'Nouveau mot de passe',
-                                labelText: 'Nouveau mot de passe',
-                              ),
-                              controller: _passwordConfirmController,
-                              validator: (value) => value.isNotEmpty
-                                  ? null
-                                  : "Champ de saisie obligatoire",
-                            ),
-                          ),
-                          Container(
-                            // color: Colors.deepPurple,                           
-                            width: cardWidth*0.9,
-                            margin: EdgeInsets.only(bottom: 10),
-                              child: RaisedButton( 
-                                padding: EdgeInsets.fromLTRB(5, 13, 5, 13),
-                                color: Colors.deepPurple,
-                            child: Text('Enregistrer', style: TextStyle(color: Colors.white),),
-                            onPressed: () => null,
-                          )),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+                        ),
+                      ],
+                    );
+                  });
+            }
+            return CircularProgressIndicator();
+          },
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: null,
-          child: Icon(Icons.plus_one),
+          child: FlatButton(
+              onPressed: () => Navigator.pushNamed(context, '/add_user'),
+              child: Icon(
+                Icons.group_add,
+                color: Colors.white,
+              )),
         ),
         drawer: DrawerWidget(
           userData: data["username"],

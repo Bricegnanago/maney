@@ -35,15 +35,19 @@ class DbUserManager {
             'userId INTEGER PRIMARY KEY AUTOINCREMENT,'
             'username TEXT NOT NULL,'
             'password TEXT NOT NULL,'
-            'status INTEGER, '
+            'status INTEGER,'
             'level INTEGER, '
-            'createdAt TIMESTAMP,'
+            'createdAt TIMESTAMP, '
+            'lastUpdate TEXT DEFAULT NULL, '
             ' FOREIGN KEY(level) REFERENCES userLevel(levelId)'
             ')';
         await db.execute(reqUser);
         final reqTonIsertOneUser =
-            'INSERT INTO user VALUES(null, "gnanagobrice", "mamson", 1, 3, strftime("%d-%m-%Y %H:%M:%S", datetime("now")))';
+            'INSERT INTO user VALUES(null, "gnanagobrice", "mamson", 1, 3, strftime("%d-%m-%Y %H:%M:%S", datetime("now")), NULL)';
         await db.execute(reqTonIsertOneUser);
+        final reqTonIsertOneUser2 =
+            'INSERT INTO user VALUES(null, "koffijonathan", "mamson", 1, 2, strftime("%d-%m-%Y %H:%M:%S", datetime("now")), NULL)';
+        await db.execute(reqTonIsertOneUser2);
 
         final String reqCustomer =
             'CREATE TABLE customer(customerId INTEGER PRIMARY KEY AUTOINCREMENT,'
@@ -123,6 +127,21 @@ insert un client dans la base e données
       return await _database.insert('user', user.toMap());
   }
 
+  //   Future<int> updateUser(User user) async {
+  //   await openDb();
+  //   // User user;
+  //   // user.username = username;
+  //   bool flag = await isUserExist(user);
+  //   if (flag)
+  //     return -1;
+  //   else {
+  //     $sql = "update user set username = , password = ?, status= , level= ?, lastupdate";
+  //     return await _database.rawUpdate('');
+  //   }
+      
+  // }
+
+
   // Recupère la liste de tout les utilisateurs
   Future<List<User>> getListuser() async {
     await openDb();
@@ -136,14 +155,14 @@ insert un client dans la base e données
               createdAt: maps[index]["createdAt"],
               status: maps[index]["status"],
               level: maps[index]["level"],
-            ));
+            ));          
   }
 
   //Met a jour un utilisateur de la base de données
-  Future<int> updateUser(User user) async {
+  Future<int> updateUser(User userToUpdate, User user) async {
     await openDb();
     return await _database.update("user", user.toMap(),
-        where: "userId = ?", whereArgs: [user.userId]);
+        where: "userId = ?", whereArgs: [userToUpdate.userId]);
   }
 
    Future<String> getUsername(int userId) async {
@@ -395,20 +414,29 @@ insert un client dans la base e données
   Future<int> countCustomer() async {
     await openDb();
     final sql = 'SELECT COUNT(*) as  nbCustomer FROM customer';
-    List<Map<String, dynamic>> result = await _database.rawQuery(sql);    
+    List<Map<String, dynamic>> result = await _database.rawQuery(sql);
+    print('value : ${result[0]["nbCustomer"]}');
     return result[0]["nbCustomer"];
   }
   Future<int> totalBalance() async {
     await openDb();
     final sql = 'SELECT SUM(balance) as allCredit FROM account';
-    List<Map<String, dynamic>> result = await _database.rawQuery(sql);    
-    return result[0]["allCredit"];
+    List<Map<String, dynamic>> result = await _database.rawQuery(sql);
+    
+    // if(result[0]["allCredit"].toString() == 'null'){
+    //   result[0]["allCredit"] = "0.0";
+    // }
+    // print('value : ${result[0]["allCredit"]}');
+    var allCredit = result[0]["allCredit"];
+    return (allCredit.runtimeType == Null) ? 0 : allCredit;
+  // print('all credit : ${result[0]["allCredit"]}');
+    // return result[0]["allCredit"];
   }
 
   Future<int> percentReturnedCredit() async {
     await openDb();
     final sql = 'SELECT count(*) as percentOfReturnedCredit FROM account where balance = 0';
-    List<Map<String, dynamic>> result = await _database.rawQuery(sql);    
+    List<Map<String, dynamic>> result = await _database.rawQuery(sql);
     return result[0]["percentOfReturnedCredit"];
   }
 
